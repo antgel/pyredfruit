@@ -48,6 +48,7 @@ class MainWindow(Gtk.Window):
     def __init__(self):
         super().__init__(title=sys.argv[0])
 
+        self.state = "stopped"
         self.timer = Timer("pomodoro", 25, 0)
 
         box = Gtk.Box(spacing=6)
@@ -64,8 +65,16 @@ class MainWindow(Gtk.Window):
         box.pack_start(button, True, True, 0)
 
     def clicked_start(self, button):
-        button.set_label("Pause")
-        self.start_pomodoro()
+        match self.state:
+            case "stopped":
+                button.set_label("Pause")
+                self.start_pomodoro()
+            case "running":
+                button.set_label("Restart")
+                self.state = "paused"
+            case "paused":
+                button.set_label("Pause")
+                self.state = "running"
 
     def time_up(self):
         dialog = Gtk.MessageDialog(
@@ -86,15 +95,17 @@ class MainWindow(Gtk.Window):
     def start_pomodoro(self):
         self.timer = Timer("pomodoro", 25, 0)
         self.start_tick()
+        self.state = "running"
 
     def start_tick(self):
         GLib.timeout_add_seconds(1, self.update_time)
 
     def update_time(self):
-        self.timer.decrement_second()
-        self.time_label.set_markup(
-            f'<span size="500%" weight="bold">{self.timer}</span>'
-        )
+        if self.state == "running":
+            self.timer.decrement_second()
+            self.time_label.set_markup(
+                f'<span size="500%" weight="bold">{self.timer}</span>'
+            )
         if self.timer.has_expired():
             self.time_up()
             return False

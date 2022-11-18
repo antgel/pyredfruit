@@ -7,6 +7,7 @@ A Pomodoro timer written in Python and Python GTK.
 ```
 git clone https://github.com/antgel/pyredfruit
 pipenv install  # --dev if you're going to hack on the code
+sudo apt install libgirepository1.0-dev  # or the equivalent for your distribution (see https://stackoverflow.com/questions/18025730/pygobject-2-28-6-wont-configure-no-package-gobject-introspection-1-0-found) if you're going to hack on the code 
 pipenv run pyredfruit
 ```
 

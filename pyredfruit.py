@@ -60,9 +60,23 @@ class MainWindow(Gtk.Window):
         )
         box.pack_start(self.time_label, True, True, 0)
 
+        self.status = Gtk.Label()
+        self.sync_state()
+        box.pack_start(self.status, True, True, 0)
+
         button = Gtk.Button.new_with_label("Start")
         button.connect("clicked", self.clicked_start)
         box.pack_start(button, True, True, 0)
+
+    # There is probably (hopefully) a better way to do this rather than
+    # calling this function every second when the timer ticks. Ideally
+    # UI components would listen for state changes. But as I don't have
+    # time to read all the docs, especially
+    # https://python-gtk-3-tutorial.readthedocs.io/en/latest/application.html
+    # which mentions Gio.SimpleAction amongst other things, and there is
+    # only one label that changes state at the moment, do it like this.
+    def sync_state(self):
+        self.status.set_label(f"{self.state} {self.timer.type}")
 
     def clicked_start(self, button):
         match self.state:
@@ -98,9 +112,10 @@ class MainWindow(Gtk.Window):
         self.state = "running"
 
     def start_tick(self):
-        GLib.timeout_add_seconds(1, self.update_time)
+        GLib.timeout_add_seconds(1, self.update_state)
 
-    def update_time(self):
+
+    def update_state(self):
         if self.state == "running":
             self.timer.decrement_second()
             self.time_label.set_markup(
@@ -110,6 +125,7 @@ class MainWindow(Gtk.Window):
             self.time_up()
             return False
 
+        self.sync_state()
         return True  # timeout_add_seconds will keep going
 
 

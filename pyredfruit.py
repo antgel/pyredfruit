@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from playsound import playsound
+
 import datetime
 import sys
 import gi
@@ -91,6 +93,7 @@ class MainWindow(Gtk.Window):
                 self.state = "running"
 
     def time_up(self):
+        playsound('bell.wav')
         dialog = Gtk.MessageDialog(
             buttons=Gtk.ButtonsType.OK, text=self.timer.done_text()
         )
